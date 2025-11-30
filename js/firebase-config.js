@@ -23,13 +23,25 @@ let app, db, auth;
 
 try {
     app = firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    auth = firebase.auth();
+
+    // Initialize Firestore
+    if (firebase.firestore) {
+        db = firebase.firestore();
+    } else {
+        console.error("❌ Firebase Firestore module not loaded");
+    }
+
+    // Initialize Auth
+    if (firebase.auth) {
+        auth = firebase.auth();
+    } else {
+        console.error("❌ Firebase Auth module not loaded");
+    }
 
     console.log('✅ Firebase initialized successfully');
 } catch (error) {
     console.error('❌ Error initializing Firebase:', error);
-    alert('Error al conectar con la base de datos. Por favor recarga la página.');
+    // Don't alert immediately to avoid annoying popups, let the UI handle it
 }
 
 // Export for use in other modules
