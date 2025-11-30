@@ -5,10 +5,35 @@ let currentSubcategory = 'Todos';
 
 // Subcategory Definitions
 const subcategories = {
-    '🛒': ['Herramientas Eléctricas', 'Herramientas Manuales', 'Domótica', 'Material Eléctrico', 'Plomería', 'Tornillería', 'Construcción'],
-    '☀️': ['Componentes', 'Instalación'],
-    '🖨️': ['Impresión', 'Diseño', 'General'],
-    '⚡': ['Mantenimiento', 'Instalación', 'General']
+    '🛒': [
+        'Herramientas Eléctricas',
+        'Herramientas Manuales',
+        'Automatización & Domótica',
+        'Material Eléctrico',
+        'Plomería & Sanitarios',
+        'Tornillería & Fijaciones',
+        'Materiales de Construcción',
+        'Baterías de Alto Rendimiento'
+    ],
+    '☀️': [
+        'Paneles Solares',
+        'Inversores & Controladores',
+        'Baterías & Almacenamiento',
+        'Instalación Solar',
+        'Accesorios & Montaje'
+    ],
+    '🖨️': [
+        'Impresión 3D',
+        'Diseño CAD 3D',
+        'Prototipado Rápido',
+        'Filamentos & Materiales'
+    ],
+    '⚡': [
+        'Mantenimiento Eléctrico',
+        'Instalaciones Eléctricas',
+        'Proyectos de Ingeniería',
+        'Consultoría Técnica'
+    ]
 };
 
 // DOM Elements
