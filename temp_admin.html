@@ -1,4 +1,4 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -52,7 +52,7 @@
 
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Gesti‚îú‚îÇn de Productos</h2>
+            <h2>Gesti+¶n de Productos</h2>
             <div class="d-flex gap-2">
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar por ID..."
                     onkeyup="searchProducts()">
@@ -73,8 +73,8 @@
                                 <th>Nombre</th>
                                 <th>Precio</th>
                                 <th>Stock</th>
-                                <th>Categor‚îú¬°a</th>
-                                <th>Subcategor‚îú¬°a</th>
+                                <th>Categor+°a</th>
+                                <th>Subcategor+°a</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -99,9 +99,9 @@
                     <form id="productForm">
                         <!-- ID Field -->
                         <div class="mb-3">
-                            <label class="form-label">ID del Producto (Opcional / Autom‚îú√≠tico)</label>
+                            <label class="form-label">ID del Producto (Opcional / Autom+Ìtico)</label>
                             <input type="text" class="form-control" id="productId"
-                                placeholder="Dejar vac‚îú¬°o para autogenerar">
+                                placeholder="Dejar vac+°o para autogenerar">
                         </div>
 
                         <div class="mb-3">
@@ -119,26 +119,26 @@
                                 <input type="number" class="form-control" id="productStock" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Categor‚îú¬°a</label>
+                                <label class="form-label">Categor+°a</label>
                                 <select class="form-select" id="productCategory" required
                                     onchange="updateSubcategories()">
                                     <option value="">Seleccionar...</option>
-                                    <option value="¬≠∆í√∏√Ü">¬≠∆í√∏√Ü Ventas</option>
-                                    <option value="√î√ø√á¬¥¬©√Ö">√î√ø√á¬¥¬©√Ö Solar</option>
-                                    <option value="¬≠∆í√ª¬ø¬¥¬©√Ö">¬≠∆í√ª¬ø¬¥¬©√Ö 3D</option>
-                                    <option value="√î√ú√≠">√î√ú√≠ Servicios</option>
+                                    <option value="≠É¯∆">≠É¯∆ Ventas</option>
+                                    <option value="‘ˇ«¥©≈">‘ˇ«¥©≈ Solar</option>
+                                    <option value="≠É˚ø¥©≈">≠É˚ø¥©≈ 3D</option>
+                                    <option value="‘‹Ì">‘‹Ì Servicios</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Subcategor‚îú¬°a</label>
+                                <label class="form-label">Subcategor+°a</label>
                                 <select class="form-select" id="productSubcategory" required>
-                                    <option value="">Seleccionar Categor‚îú¬°a primero</option>
+                                    <option value="">Seleccionar Categor+°a primero</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Descripci‚îú‚îÇn</label>
+                            <label class="form-label">Descripci+¶n</label>
                             <textarea class="form-control" id="productDescription" rows="3"></textarea>
                         </div>
 
@@ -148,7 +148,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Im‚îú√≠genes</label>
+                            <label class="form-label">Im+Ìgenes</label>
                             <div class="input-group mb-2">
                                 <input type="file" class="form-control" id="imageInput" multiple accept="image/*">
                             </div>
@@ -178,10 +178,10 @@
         let currentImages = [];
 
         const subcategories = {
-            '¬≠∆í√∏√Ü': ['Herramientas El‚îú¬Æctricas', 'Herramientas Manuales', 'Dom‚îú‚îÇtica', 'Material El‚îú¬Æctrico', 'Plomer‚îú¬°a', 'Torniller‚îú¬°a', 'Construcci‚îú‚îÇn'],
-            '√î√ø√á¬¥¬©√Ö': ['Componentes', 'Instalaci‚îú‚îÇn'],
-            '¬≠∆í√ª¬ø¬¥¬©√Ö': ['Impresi‚îú‚îÇn', 'Dise‚îú‚ñío', 'General'],
-            '√î√ú√≠': ['Mantenimiento', 'Instalaci‚îú‚îÇn', 'General']
+            '≠É¯∆': ['Herramientas El+Æctricas', 'Herramientas Manuales', 'Dom+¶tica', 'Material El+Æctrico', 'Plomer+°a', 'Torniller+°a', 'Construcci+¶n'],
+            '‘ˇ«¥©≈': ['Componentes', 'Instalaci+¶n'],
+            '≠É˚ø¥©≈': ['Impresi+¶n', 'Dise+¶o', 'General'],
+            '‘‹Ì': ['Mantenimiento', 'Instalaci+¶n', 'General']
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -205,7 +205,7 @@
                     subSelect.appendChild(option);
                 });
             } else {
-                subSelect.innerHTML = '<option value="">Seleccionar Categor‚îú¬°a primero</option>';
+                subSelect.innerHTML = '<option value="">Seleccionar Categor+°a primero</option>';
             }
         }
 
@@ -256,7 +256,7 @@
             document.getElementById('productId').disabled = false;
             document.getElementById('modalTitle').innerText = 'Nuevo Producto';
             document.getElementById('imagePreviewContainer').innerHTML = '';
-            document.getElementById('productSubcategory').innerHTML = '<option value="">Seleccionar Categor‚îú¬°a primero</option>';
+            document.getElementById('productSubcategory').innerHTML = '<option value="">Seleccionar Categor+°a primero</option>';
             currentImages = [];
             modal.show();
         }
@@ -286,7 +286,7 @@
                 modal.show();
             } catch (error) {
                 console.error(error);
-                alert('Error al cargar producto para edici‚îú‚îÇn');
+                alert('Error al cargar producto para edici+¶n');
             }
         }
 
@@ -326,7 +326,7 @@
         }
 
         async function deleteProduct(id) {
-            if (confirm('‚î¨‚îêEst‚îú√≠s seguro de eliminar este producto?')) {
+            if (confirm('-+Est+Ìs seguro de eliminar este producto?')) {
                 try {
                     await db.delete(id);
                     loadProducts();
