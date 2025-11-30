@@ -112,164 +112,161 @@
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
                 <h3 style="margin: 0;">Detalle de Venta</h3>
                 <button class="btn-outline" style="color: #333; border: 1px solid #ddd;" onclick="closeDetails()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+                    <!DOCTYPE html>
+                    <html lang="es">
 
-            <div id="modal-content"></div>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>RINCOTEC | Historial de Ventas</title>
 
-            <div style="margin-top: 20px; text-align: right;">
-                <button class="btn-primary" onclick="closeDetails()">Cerrar</button>
-                <!DOCTYPE html>
-                <html lang="es">
+                        <!-- Fonts & Icons -->
+                        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+                            rel="stylesheet">
+                        <link rel="stylesheet"
+                            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>RINCOTEC | Historial de Ventas</title>
+                        <!-- Tabulator CSS -->
+                    </head>
 
-                    <!-- Fonts & Icons -->
-                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-                        rel="stylesheet">
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-                    <!-- Tabulator CSS -->
-                </head>
-
-                <body>
-                    <header>
-                        <a href="index.html" class="brand">
-                            <i class="fas fa-tools"></i> RINCOTEC POS
-                        </a>
-                        <div class="actions">
-                            <button class="btn-danger" onclick="clearSalesHistory()">
-                                <i class="fas fa-trash-alt"></i> Borrar Historial
-                            </button>
-                            <a href="inventory.html" class="btn-outline"
-                                style="text-decoration: none; display: flex; align-items: center;">
-                                <i class="fas fa-boxes"></i> Inventario
+                    <body>
+                        <header>
+                            <a href="index.html" class="brand">
+                                <i class="fas fa-tools"></i> RINCOTEC POS
                             </a>
-                            <button class="btn-danger" onclick="adminLogout()" title="Cerrar sesión de administrador">
-                                <i class="fas fa-sign-out-alt"></i> Salir
-                            </button>
-                        </div>
-                    </header>
-
-                    <div class="stats-container">
-                        <div class="card">
-                            <h3>Total Ingresos</h3>
-                            <p id="total-revenue">$ 0</p>
-                        </div>
-                        <div class="card">
-                            <h3>Transacciones</h3>
-                            <p id="total-transactions">0</p>
-                        </div>
-                    </div>
-
-                    <div style="padding: 0 20px; flex-grow: 1; display: flex; flex-direction: column;">
-                        <h2 style="margin-top: 0;">Historial de Ventas</h2>
-                        <div id="sales-table"></div>
-                    </div>
-
-                    <!-- Invoice Template -->
-                    <template id="invoice-template">
-                        <div
-                            style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #eee;">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FECD03; padding-bottom: 10px;">
-                                <img src="https://i.imgur.com/HebS8B1.jpeg" style="height: 60px;">
-                                <div style="text-align: right;">
-                                    <h2 style="margin: 0; color: #231F20;">FACTURA DE VENTA</h2>
-                                    <p style="margin: 5px 0;">No. <span id="inv-number"></span></p>
-                                    <p style="margin: 0; font-size: 0.9rem;">Fecha: <span id="inv-date"></span></p>
-                                </div>
-                            </div>
-                            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-                                <div>
-                                    <strong>Cliente:</strong> <span id="inv-client"></span><br>
-                                    <strong>ID:</strong> <span id="inv-id"></span><br>
-                                    <strong>Dirección:</strong> <span id="inv-address"></span>
-                                </div>
-                                <div style="text-align: right;">
-                                    <strong>Método de Pago:</strong> <span id="inv-payment"></span>
-                                </div>
-                            </div>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                                <thead>
-                                    <tr style="background: #eee;">
-                                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">
-                                            Producto</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">
-                                            Cant.</th>
-                                        <th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">
-                                            Precio Unit.</th>
-                                        <th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">
-                                            Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="inv-items"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">
-                                            SUBTOTAL:</td>
-                                        <td style="padding: 10px; text-align: right; font-weight: bold;"
-                                            id="inv-subtotal"></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">
-                                            IVA:</td>
-                                        <td style="padding: 10px; text-align: right; font-weight: bold;" id="inv-iva">
-                                        </td>
-                                    </tr>
-                                    <tr style="background: #f0f0f0;">
-                                        <td colspan="3"
-                                            style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;">
-                                            TOTAL:</td>
-                                        <td style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;"
-                                            id="inv-total"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                            <div style="margin-top: 40px; text-align: center; font-size: 0.8rem; color: #777;">
-                                <p>Gracias por su compra en RINCOTEC.</p>
-                                <p>Eléctrico. Inovador. Imprimimos tu solucion. La evolucion de la ferretería.</p>
-                                <p>Nit: 1033793154 | Tel: 3057617619</p>
-                            </div>
-                        </div>
-                    </template>
-
-                    <!-- Details Modal -->
-                    <div id="details-modal" class="modal-overlay">
-                        <div class="modal-content" style="max-width: 600px; max-height: 80vh;">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
-                                <h3 style="margin: 0;">Detalle de Venta</h3>
-                                <button class="btn-outline" style="color: #333; border: 1px solid #ddd;"
-                                    onclick="closeDetails()">
-                                    <i class="fas fa-times"></i>
+                            <div class="actions">
+                                <button class="btn-danger" onclick="clearSalesHistory()">
+                                    <i class="fas fa-trash-alt"></i> Borrar Historial
+                                </button>
+                                <a href="inventory.html" class="btn-outline"
+                                    style="text-decoration: none; display: flex; align-items: center;">
+                                    <i class="fas fa-boxes"></i> Inventario
+                                </a>
+                                <button class="btn-danger" onclick="adminLogout()"
+                                    title="Cerrar sesión de administrador">
+                                    <i class="fas fa-sign-out-alt"></i> Salir
                                 </button>
                             </div>
+                        </header>
 
-                            <div id="modal-content"></div>
-
-                            <div style="margin-top: 20px; text-align: right;">
-                                <button class="btn-primary" onclick="closeDetails()">Cerrar</button>
+                        <div class="stats-container">
+                            <div class="card">
+                                <h3>Total Ingresos</h3>
+                                <p id="total-revenue">$ 0</p>
+                            </div>
+                            <div class="card">
+                                <h3>Transacciones</h3>
+                                <p id="total-transactions">0</p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Scripts -->
-                    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-                    <!-- Firebase SDKs -->
-                    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-                    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-                    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+                        <div style="padding: 0 20px; flex-grow: 1; display: flex; flex-direction: column;">
+                            <h2 style="margin-top: 0;">Historial de Ventas</h2>
+                            <div id="sales-table"></div>
+                        </div>
 
-                    <script src="js/firebase-config.js"></script>
-                    <script src="js/db.js"></script>
-                    <script src="js/auth.js"></script>
-                    <script src="js/sales.js"></script>
-                </body>
+                        <!-- Invoice Template -->
+                        <template id="invoice-template">
+                            <div
+                                style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #eee;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FECD03; padding-bottom: 10px;">
+                                    <img src="https://i.imgur.com/HebS8B1.jpeg" style="height: 60px;">
+                                    <div style="text-align: right;">
+                                        <h2 style="margin: 0; color: #231F20;">FACTURA DE VENTA</h2>
+                                        <p style="margin: 5px 0;">No. <span id="inv-number"></span></p>
+                                        <p style="margin: 0; font-size: 0.9rem;">Fecha: <span id="inv-date"></span></p>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                                    <div>
+                                        <strong>Cliente:</strong> <span id="inv-client"></span><br>
+                                        <strong>ID:</strong> <span id="inv-id"></span><br>
+                                        <strong>Dirección:</strong> <span id="inv-address"></span>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong>Método de Pago:</strong> <span id="inv-payment"></span>
+                                    </div>
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                                    <thead>
+                                        <tr style="background: #eee;">
+                                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">
+                                                Producto</th>
+                                            <th
+                                                style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">
+                                                Cant.</th>
+                                            <th
+                                                style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">
+                                                Precio Unit.</th>
+                                            <th
+                                                style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">
+                                                Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inv-items"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3"
+                                                style="padding: 10px; text-align: right; font-weight: bold;">SUBTOTAL:
+                                            </td>
+                                            <td style="padding: 10px; text-align: right; font-weight: bold;"
+                                                id="inv-subtotal"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3"
+                                                style="padding: 10px; text-align: right; font-weight: bold;">IVA:</td>
+                                            <td style="padding: 10px; text-align: right; font-weight: bold;"
+                                                id="inv-iva"></td>
+                                        </tr>
+                                        <tr style="background: #f0f0f0;">
+                                            <td colspan="3"
+                                                style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;">
+                                                TOTAL:</td>
+                                            <td style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;"
+                                                id="inv-total"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div style="margin-top: 40px; text-align: center; font-size: 0.8rem; color: #777;">
+                                    <p>Gracias por su compra en RINCOTEC.</p>
+                                    <p>Eléctrico. Inovador. Imprimimos tu solucion. La evolucion de la ferretería.</p>
+                                    <p>Nit: 1033793154 | Tel: 3057617619</p>
+                                </div>
+                            </div>
+                        </template>
 
-                </html>
+                        <!-- Details Modal -->
+                        <div id="details-modal" class="modal-overlay">
+                            <div class="modal-content" style="max-width: 600px; max-height: 80vh;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
+                                    <h3 style="margin: 0;">Detalle de Venta</h3>
+                                    <button class="btn-outline" style="color: #333; border: 1px solid #ddd;"
+                                        onclick="closeDetails()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <div id="modal-content"></div>
+
+                                <div style="margin-top: 20px; text-align: right;">
+                                    <button class="btn-primary" onclick="closeDetails()">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scripts -->
+                        <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+                        <!-- Firebase SDKs -->
+                        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+                        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+                        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+                        <script src="js/firebase-config.js"></script>
+                        <script src="js/db.js"></script>
+                        <script src="js/auth.js"></script>
+                        <script src="js/sales.js"></script>
+                    </body>
+
+                    </html>

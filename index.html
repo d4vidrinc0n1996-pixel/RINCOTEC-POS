@@ -14,16 +14,31 @@
         rel="stylesheet">
 
     <!-- Icons -->
-    <a href="#" class="logo">
-        <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC" style="height: 50px;">
-    </a>
-    <nav>
-        <ul>
-            <li><a href="#" onclick="filterProducts('Todos')">Inicio</a></li>
-            <li><a href="#" onclick="filterProducts('🛒')">Tienda</a></li>
-            <li><a href="#" onclick="filterProducts('⚡')">Servicios</a></li>
-        </ul>
-    </nav>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="index-header">
+        <a href="#" class="logo">
+            <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC" style="height: 50px;">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="filterProducts('Todos')">Inicio</a></li>
+                <li><a href="#" onclick="filterProducts('🛒')">Tienda</a></li>
+                <li><a href="#" onclick="filterProducts('⚡')">Servicios</a></li>
+            </ul>
+        </nav>
     </header>
 
     <!-- Hero -->
@@ -93,5 +108,18 @@
             <a href="https://www.tiktok.com/@ferreteriarincoteccol?_r=1&_t=ZS-91pd886z6vf" target="_blank"><i
                     class="fab fa-tiktok"></i></a>
             <a href="https://wa.me/573057617619" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <div class="copyright">
+            &copy; 2024 RINCOTEC Ingeniería. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    <!-- Database Module -->
+    <script src="js/db.js"></script>
+    <!-- Main Logic -->
+    <script src="js/main.js"></script>
+</body>
 
 </html>
