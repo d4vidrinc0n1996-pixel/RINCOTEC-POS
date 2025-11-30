@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RINCOTEC | Admin Panel</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            border-bottom: 5px solid #FECD03;
+        }
+
+        .img-thumbnail-custom {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+
+        .preview-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC" height="30"
+                    class="d-inline-block align-text-top">
+                Admin
+            </a>
+            <a href="index.html" class="btn btn-outline-light btn-sm">Ir a la Tienda</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gesti├│n de Productos</h2>
+            <div class="d-flex gap-2">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por ID..."
+                    onkeyup="searchProducts()">
+                <button class="btn btn-success" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Nuevo Producto
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Categor├¡a</th>
+                                <th>Subcategor├¡a</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <!-- Rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Nuevo Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <!-- ID Field -->
+                        <div class="mb-3">
+                            <label class="form-label">ID del Producto (Opcional / Autom├ítico)</label>
+                            <input type="text" class="form-control" id="productId"
+                                placeholder="Dejar vac├¡o para autogenerar">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Precio</label>
+                                <input type="number" class="form-control" id="productPrice" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" id="productStock" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Categor├¡a</label>
+                                <select class="form-select" id="productCategory" required
+                                    onchange="updateSubcategories()">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="­ƒøÆ">­ƒøÆ Ventas</option>
+                                    <option value="ÔÿÇ´©Å">ÔÿÇ´©Å Solar</option>
+                                    <option value="­ƒû¿´©Å">­ƒû¿´©Å 3D</option>
+                                    <option value="ÔÜí">ÔÜí Servicios</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Subcategor├¡a</label>
+                                <select class="form-select" id="productSubcategory" required>
+                                    <option value="">Seleccionar Categor├¡a primero</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripci├│n</label>
+                            <textarea class="form-control" id="productDescription" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Link MercadoLibre (Opcional)</label>
+                            <input type="url" class="form-control" id="productMlLink" placeholder="https://...">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Im├ígenes</label>
+                            <div class="input-group mb-2">
+                                <input type="file" class="form-control" id="imageInput" multiple accept="image/*">
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="url" class="form-control" id="imageUrlInput"
+                                    placeholder="O pegar URL de imagen externa">
+                                <button class="btn btn-outline-secondary" type="button" onclick="addUrlImage()">Agregar
+                                    URL</button>
+                            </div>
+                            <div id="imagePreviewContainer" class="d-flex flex-wrap"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/db.js"></script>
+    <script>
+        let modal;
+        let currentImages = [];
+
+        const subcategories = {
+            '­ƒøÆ': ['Herramientas El├®ctricas', 'Herramientas Manuales', 'Dom├│tica', 'Material El├®ctrico', 'Plomer├¡a', 'Torniller├¡a', 'Construcci├│n'],
+            'ÔÿÇ´©Å': ['Componentes', 'Instalaci├│n'],
+            '­ƒû¿´©Å': ['Impresi├│n', 'Dise├▒o', 'General'],
+            'ÔÜí': ['Mantenimiento', 'Instalaci├│n', 'General']
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            modal = new bootstrap.Modal(document.getElementById('productModal'));
+            loadProducts();
+
+            // File Input Handler
+            document.getElementById('imageInput').addEventListener('change', handleFileSelect);
+        });
+
+        function updateSubcategories() {
+            const cat = document.getElementById('productCategory').value;
+            const subSelect = document.getElementById('productSubcategory');
+            subSelect.innerHTML = '';
+
+            if (cat && subcategories[cat]) {
+                subcategories[cat].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.innerText = sub;
+                    subSelect.appendChild(option);
+                });
+            } else {
+                subSelect.innerHTML = '<option value="">Seleccionar Categor├¡a primero</option>';
+            }
+        }
+
+        async function loadProducts() {
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
+
+            try {
+                const products = await db.getAll();
+                tbody.innerHTML = '';
+
+                if (products.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay productos.</td></tr>';
+                    return;
+                }
+
+                products.forEach(p => {
+                    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://via.placeholder.com/50';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${p.id}</strong></td>
+                        <td><img src="${img}" class="img-thumbnail-custom"></td>
+                        <td>${p.name}</td>
+                        <td>$${p.price.toLocaleString()}</td>
+                        <td>${p.stock !== undefined ? p.stock : 'N/A'}</td>
+                        <td><span class="badge bg-secondary">${p.category}</span></td>
+                        <td><small>${p.subcategory || '-'}</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="editProduct('${p.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar productos</td></tr>';
+            }
+        }
+
+        function openModal() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productId').disabled = false;
+            document.getElementById('modalTitle').innerText = 'Nuevo Producto';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('productSubcategory').innerHTML = '<option value="">Seleccionar Categor├¡a primero</option>';
+            currentImages = [];
+            modal.show();
+        }
+
+        async function editProduct(id) {
+            try {
+                const product = await db.getById(id);
+                if (!product) return;
+
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productId').disabled = true;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productStock').value = product.stock !== undefined ? product.stock : 0;
+                document.getElementById('productCategory').value = product.category;
+
+                updateSubcategories();
+                document.getElementById('productSubcategory').value = product.subcategory || '';
+
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productMlLink').value = product.mlLink || '';
+
+                currentImages = product.images || [];
+                renderImagePreviews();
+
+                document.getElementById('modalTitle').innerText = 'Editar Producto';
+                modal.show();
+            } catch (error) {
+                console.error(error);
+                alert('Error al cargar producto para edici├│n');
+            }
+        }
+
+        async function saveProduct() {
+            const id = document.getElementById('productId').value;
+            const isEdit = document.getElementById('productId').disabled;
+
+            const product = {
+                id: id,
+                name: document.getElementById('productName').value,
+                price: Number(document.getElementById('productPrice').value),
+                stock: Number(document.getElementById('productStock').value),
+                category: document.getElementById('productCategory').value,
+                subcategory: document.getElementById('productSubcategory').value,
+                description: document.getElementById('productDescription').value,
+                mlLink: document.getElementById('productMlLink').value,
+                images: currentImages
+            };
+
+            if (!product.name || !product.price) {
+                alert('Nombre y Precio son obligatorios');
+                return;
+            }
+
+            try {
+                if (isEdit) {
+                    await db.update({ ...product });
+                } else {
+                    await db.add(product);
+                }
+                modal.hide();
+                loadProducts();
+            } catch (error) {
+                console.error(error);
+                alert(error.message || 'Error al guardar');
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (confirm('┬┐Est├ís seguro de eliminar este producto?')) {
+                try {
+                    await db.delete(id);
+                    loadProducts();
+                } catch (error) {
+                    console.error(error);
+                    alert('Error al eliminar');
+                }
+            }
+        }
+
+        function searchProducts() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('productTableBody');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td')[0];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // Image Handling
+        function handleFileSelect(evt) {
+            const files = evt.target.files;
+            if (!files) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImages.push(e.target.result);
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addUrlImage() {
+            const url = document.getElementById('imageUrlInput').value;
+            if (url) {
+                currentImages.push(url);
+                document.getElementById('imageUrlInput').value = '';
+                renderImagePreviews();
+            }
+        }
+
+        function renderImagePreviews() {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            currentImages.forEach((img, index) => {
+                const div = document.createElement('div');
+                div.style.position = 'relative';
+                div.innerHTML = `
+                    <img src="${img}" class="preview-img">
+                    <button type="button" class="btn-close" 
+                        style="position:absolute; top:0; right:0; background-color:white;" 
+                        onclick="removeImage(${index})"></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.removeImage = function (index) {
+            currentImages.splice(index, 1);
+            renderImagePreviews();
+        }
+    </script>
+</body>
+
+</html>
