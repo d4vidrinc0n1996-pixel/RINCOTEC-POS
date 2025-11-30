@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RINCOTEC | Gestor de Inventario</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tabulator CSS -->
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_modern.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Firebase Config (must load before auth) -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Authentication - Must be after Firebase -->
+    <script src="js/auth.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html" class="brand">
+            <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC">
+            RINCOTEC POS
+        </a>
+        <div class="actions">
+            <button id="login-btn" class="btn-primary" onclick="openLoginModal()">
+                <i class="fas fa-user-lock"></i> Admin
+            </button>
+            <div class="admin-only" style="display: none; gap: 10px;">
+                <button class="btn-success" onclick="addProduct()">
+                    <i class="fas fa-plus"></i> Nuevo
+                </button>
+                <button class="btn-danger" onclick="deleteSelected()">
+                    <i class="fas fa-trash"></i> Borrar
+                </button>
+                <button class="btn-outline" onclick="downloadCSV()">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button class="btn-danger" onclick="clearSalesHistory()">
+                    <i class="fas fa-trash-alt"></i> Historial
+                </button>
+            </div>
+            <button class="btn-primary" onclick="startScanner()">
+                <i class="fas fa-barcode"></i> Escanear
+            </button>
+            <button class="btn-danger" onclick="adminLogout()" title="Cerrar sesión de administrador">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div id="status-bar">
+        <span id="record-count">Cargando...</span>
+        <span><i class="fas fa-wifi"></i> Online</span>
+    </div>
+
+    <!-- Main Layout -->
+    <div style="display: flex; flex-grow: 1; overflow: hidden;">
+        <!-- Inventory Table -->
+        <div id="inventory-table"></div>
+
+        <!-- Cart Sidebar -->
+        <div
+            style="width: 300px; background: #f8f9fa; border-left: 1px solid #dee2e6; display: flex; flex-direction: column;">
+            <div style="padding: 15px; background: var(--dark); color: white; font-weight: bold;">
+                <i class="fas fa-shopping-cart"></i> Carrito de Venta
+            </div>
+
+            <div id="cart-items" style="flex-grow: 1; overflow-y: auto; padding: 10px;">
+                <p style="text-align: center; color: #888; margin-top: 20px;">El carrito está vacío.</p>
+            </div>
+
+            <div style="padding: 15px; background: white; border-top: 1px solid #dee2e6;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;">
+                    <span>Total:</span>
+                    <span id="cart-total">$ 0</span>
+                </div>
+
+                <input type="text" id="client-name" placeholder="Nombre Cliente"
+                    style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="client-id" placeholder="CC / NIT"
+                    style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="client-address" placeholder="Dirección / Ciudad"
+                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+
+                <select id="payment-method"
+                    style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Nequi/Daviplata">Nequi / Daviplata</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                </select>
+
+                <button class="btn-success" style="width: 100%; justify-content: center;" onclick="checkout()">
+                    <i class="fas fa-check-circle"></i> Finalizar Venta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 300px; text-align: center;">
+            <h3 style="margin-top: 0; color: var(--dark);">Acceso Administrativo</h3>
+            <input type="text" id="username" placeholder="Usuario"
+                style="width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box;">
+            <input type="password" id="password" placeholder="Contraseña"
+                style="width: 100%; padding: 10px; margin-bottom: 20px; box-sizing: border-box;">
+            <button class="btn-primary" style="width: 100%; justify-content: center;"
+                onclick="login()">Ingresar</button>
+            <button class="btn-danger" style="width: 100%; justify-content: center; margin-top: 10px;"
+                onclick="closeLoginModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Invoice Template -->
+    <template id="invoice-template">
+        <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #eee;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FECD03; padding-bottom: 10px;">
+                <img src="https://i.imgur.com/HebS8B1.jpeg" style="height: 60px;">
+                <div style="text-align: right;">
+                    <h2 style="margin: 0; color: #231F20;">FACTURA DE VENTA</h2>
+                    <p style="margin: 5px 0;">No. <span id="inv-number"></span></p>
+                    <p style="margin: 0; font-size: 0.9rem;">Fecha: <span id="inv-date"></span></p>
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <div>
+                    <strong>Cliente:</strong> <span id="inv-client"></span><br>
+                    <strong>ID:</strong> <span id="inv-id"></span><br>
+                    <strong>Dirección:</strong> <span id="inv-address"></span>
+                </div>
+                <div style="text-align: right;">
+                    <strong>Método de Pago:</strong> <span id="inv-payment"></span>
+                </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background: #eee;">
+                        <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Producto</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">Cant.</th>
+                        <th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">Precio Unit.</th>
+                        <th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="inv-items"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">SUBTOTAL:</td>
+                        <td style="padding: 10px; text-align: right; font-weight: bold;" id="inv-subtotal"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold;">IVA:</td>
+                        <td style="padding: 10px; text-align: right; font-weight: bold;" id="inv-iva"></td>
+                    </tr>
+                    <tr style="background: #f0f0f0;">
+                        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;">
+                            TOTAL:</td>
+                        <td style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1rem;"
+                            id="inv-total"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="margin-top: 40px; text-align: center; font-size: 0.8rem; color: #777;">
+                <p>Gracias por su compra en RINCOTEC.</p>
+                <p>Eléctrico. Inovador. Imprimimos tu solucion. La evolucion de la ferretería.</p>
+                <p>Nit: 1033793154 | Tel: 3057617619</p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Nuevo Producto</h3>
+            <form id="product-form" onsubmit="event.preventDefault(); saveProduct();">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label>Código / ID</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="prod-id" required style="width: 100%; padding: 8px;">
+                            <button type="button" class="btn-primary" onclick="startScanner(true)"><i
+                                    class="fas fa-barcode"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="prod-name" required style="width: 100%; padding: 8px;">
+                    </div>
+                    <div>
+                        <label>Precio Base</label>
+                        <input type="number" id="prod-price" required style="width: 100%; padding: 8px;">
+                    </div>
+                    <div>
+                        <label>Stock Inicial</label>
+                        <input type="number" id="prod-stock" required style="width: 100%; padding: 8px;">
+                    </div>
+                    <div>
+                        <label>IVA (%)</label>
+                        <input type="number" id="prod-iva" value="19" style="width: 100%; padding: 8px;">
+                    </div>
+                    <div>
+                        <label>Categoría</label>
+                        <select id="prod-category" required style="width: 100%; padding: 8px;"
+                            onchange="updateSubcategories()"></select>
+                    </div>
+                    <div>
+                        <label>Subcategoría</label>
+                        <select id="prod-subcategory" style="width: 100%; padding: 8px;"></select>
+                    </div>
+                    <div>
+                        <label>URL Imagen</label>
+                        <input type="text" id="prod-image" style="width: 100%; padding: 8px;">
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label>Descripción</label>
+                    <textarea id="prod-desc" style="width: 100%; padding: 8px;" rows="3"></textarea>
+                </div>
+                <div style="margin-top: 20px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn-danger" onclick="closeProductModal()">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <h3>Escanear Código de Barras</h3>
+            <div id="reader" style="width: 100%;"></div>
+            <button class="btn-danger" style="margin-top: 15px;" onclick="closeScanner()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+    <script src="js/db.js"></script>
+    <script src="js/inventory.js"></script>
+</body>
+
+</html>
