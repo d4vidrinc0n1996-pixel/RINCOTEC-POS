@@ -159,248 +159,237 @@
                                     URL</button>
                             </div>
                             <div id="imagePreviewContainer" class="d-flex flex-wrap"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+                            // File Input Handler
+                            document.getElementById('imageInput').addEventListener('change', handleFileSelect);
+                            });
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/db.js"></script>
-    <script>
-        let modal;
-        let currentImages = [];
+                            function updateSubcategories() {
+                            const cat = document.getElementById('productCategory').value;
+                            const subSelect = document.getElementById('productSubcategory');
+                            subSelect.innerHTML = '';
 
-        const subcategories = {
-            '🛒': ['Herramientas Eléctricas', 'Herramientas Manuales', 'Domótica', 'Material Eléctrico', 'Plomería', 'Tornillería', 'Construcción'],
-            '☀️': ['Componentes', 'Instalación'],
-            '🖨️': ['Impresión', 'Diseño', 'General'],
-            '⚡': ['Mantenimiento', 'Instalación', 'General']
-        };
+                            if (cat && subcategories[cat]) {
+                            subcategories[cat].forEach(sub => {
+                            const option = document.createElement('option');
+                            option.value = sub;
+                            option.innerText = sub;
+                            subSelect.appendChild(option);
+                            });
+                            } else {
+                            subSelect.innerHTML = '<option value="">Seleccionar Categoría primero</option>';
+                            }
+                            }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            modal = new bootstrap.Modal(document.getElementById('productModal'));
-            loadProducts();
+                            async function loadProducts() {
+                            const tbody = document.getElementById('productTableBody');
+                            tbody.innerHTML = '<tr>
+                                <td colspan="7" class="text-center">Cargando...</td>
+                            </tr>';
 
-            // File Input Handler
-            document.getElementById('imageInput').addEventListener('change', handleFileSelect);
-        });
+                            try {
+                            const products = await db.getAll();
+                            tbody.innerHTML = '';
 
-        function updateSubcategories() {
-            const cat = document.getElementById('productCategory').value;
-            const subSelect = document.getElementById('productSubcategory');
-            subSelect.innerHTML = '';
+                            if (products.length === 0) {
+                            tbody.innerHTML = '<tr>
+                                <td colspan="7" class="text-center">No hay productos.</td>
+                            </tr>';
+                            return;
+                            }
 
-            if (cat && subcategories[cat]) {
-                subcategories[cat].forEach(sub => {
-                    const option = document.createElement('option');
-                    option.value = sub;
-                    option.innerText = sub;
-                    subSelect.appendChild(option);
-                });
-            } else {
-                subSelect.innerHTML = '<option value="">Seleccionar Categoría primero</option>';
-            }
-        }
+                            products.forEach(p => {
+                            const img = p.images && p.images.length > 0 ? p.images[0] :
+                            'https://via.placeholder.com/50';
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                            <td><strong>${p.id}</strong></td>
+                            <td><img src="${img}" class="img-thumbnail-custom"></td>
+                            <td>${p.name}</td>
+                            <td>$${p.price.toLocaleString()}</td>
+                            <td>${p.stock !== undefined ? p.stock : 'N/A'}</td>
+                            <td><span class="badge bg-secondary">${p.category}</span></td>
+                            <td><small>${p.subcategory || '-'}</small></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editProduct('${p.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                            `;
+                            tbody.appendChild(tr);
+                            });
+                            } catch (error) {
+                            console.error(error);
+                            tbody.innerHTML = '<tr>
+                                <td colspan="7" class="text-center text-danger">Error al cargar productos</td>
+                            </tr>';
+                            }
+                            }
 
-        async function loadProducts() {
-            const tbody = document.getElementById('productTableBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
+                            function openModal() {
+                            document.getElementById('productForm').reset();
+                            document.getElementById('productId').value = '';
+                            document.getElementById('productId').disabled = false;
+                            document.getElementById('modalTitle').innerText = 'Nuevo Producto';
+                            document.getElementById('imagePreviewContainer').innerHTML = '';
+                            document.getElementById('productSubcategory').innerHTML = '<option value="">Seleccionar
+                                Categoría
+                                primero</option>';
+                            currentImages = [];
+                            modal.show();
+                            }
 
-            try {
-                const products = await db.getAll();
-                tbody.innerHTML = '';
+                            async function editProduct(id) {
+                            try {
+                            const product = await db.getById(id);
+                            if (!product) return;
 
-                if (products.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay productos.</td></tr>';
-                    return;
-                }
+                            document.getElementById('productId').value = product.id;
+                            document.getElementById('productId').disabled = true;
+                            document.getElementById('productName').value = product.name;
+                            document.getElementById('productPrice').value = product.price;
+                            document.getElementById('productStock').value = product.stock !== undefined ? product.stock
+                            : 0;
+                            document.getElementById('productCategory').value = product.category;
 
-                products.forEach(p => {
-                    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://via.placeholder.com/50';
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${p.id}</strong></td>
-                        <td><img src="${img}" class="img-thumbnail-custom"></td>
-                        <td>${p.name}</td>
-                        <td>$${p.price.toLocaleString()}</td>
-                        <td>${p.stock !== undefined ? p.stock : 'N/A'}</td>
-                        <td><span class="badge bg-secondary">${p.category}</span></td>
-                        <td><small>${p.subcategory || '-'}</small></td>
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" onclick="editProduct('${p.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar productos</td></tr>';
-            }
-        }
+                            updateSubcategories();
+                            document.getElementById('productSubcategory').value = product.subcategory || '';
 
-        function openModal() {
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('productId').disabled = false;
-            document.getElementById('modalTitle').innerText = 'Nuevo Producto';
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-            document.getElementById('productSubcategory').innerHTML = '<option value="">Seleccionar Categoría primero</option>';
-            currentImages = [];
-            modal.show();
-        }
+                            document.getElementById('productDescription').value = product.description || '';
+                            document.getElementById('productMlLink').value = product.mlLink || '';
 
-        async function editProduct(id) {
-            try {
-                const product = await db.getById(id);
-                if (!product) return;
+                            currentImages = product.images || [];
+                            renderImagePreviews();
 
-                document.getElementById('productId').value = product.id;
-                document.getElementById('productId').disabled = true;
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productPrice').value = product.price;
-                document.getElementById('productStock').value = product.stock !== undefined ? product.stock : 0;
-                document.getElementById('productCategory').value = product.category;
+                            document.getElementById('modalTitle').innerText = 'Editar Producto';
+                            modal.show();
+                            } catch (error) {
+                            console.error(error);
+                            alert('Error al cargar producto para edición');
+                            }
+                            }
 
-                updateSubcategories();
-                document.getElementById('productSubcategory').value = product.subcategory || '';
+                            async function saveProduct() {
+                            const id = document.getElementById('productId').value;
+                            const isEdit = document.getElementById('productId').disabled;
 
-                document.getElementById('productDescription').value = product.description || '';
-                document.getElementById('productMlLink').value = product.mlLink || '';
+                            const product = {
+                            id: id,
+                            name: document.getElementById('productName').value,
+                            price: Number(document.getElementById('productPrice').value),
+                            stock: Number(document.getElementById('productStock').value),
+                            category: document.getElementById('productCategory').value,
+                            subcategory: document.getElementById('productSubcategory').value,
+                            description: document.getElementById('productDescription').value,
+                            mlLink: document.getElementById('productMlLink').value,
+                            images: currentImages
+                            };
 
-                currentImages = product.images || [];
-                renderImagePreviews();
+                            if (!product.name || !product.price) {
+                            alert('Nombre y Precio son obligatorios');
+                            return;
+                            }
 
-                document.getElementById('modalTitle').innerText = 'Editar Producto';
-                modal.show();
-            } catch (error) {
-                console.error(error);
-                alert('Error al cargar producto para edición');
-            }
-        }
+                            try {
+                            if (isEdit) {
+                            await db.update({ ...product });
+                            } else {
+                            await db.add(product);
+                            }
+                            modal.hide();
+                            loadProducts();
+                            } catch (error) {
+                            console.error(error);
+                            alert(error.message || 'Error al guardar');
+                            }
+                            }
 
-        async function saveProduct() {
-            const id = document.getElementById('productId').value;
-            const isEdit = document.getElementById('productId').disabled;
+                            async function deleteProduct(id) {
+                            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                            try {
+                            await db.delete(id);
+                            loadProducts();
+                            } catch (error) {
+                            console.error(error);
+                            alert('Error al eliminar');
+                            }
+                            }
+                            }
 
-            const product = {
-                id: id,
-                name: document.getElementById('productName').value,
-                price: Number(document.getElementById('productPrice').value),
-                stock: Number(document.getElementById('productStock').value),
-                category: document.getElementById('productCategory').value,
-                subcategory: document.getElementById('productSubcategory').value,
-                description: document.getElementById('productDescription').value,
-                mlLink: document.getElementById('productMlLink').value,
-                images: currentImages
-            };
+                            function searchProducts() {
+                            const input = document.getElementById('searchInput');
+                            const filter = input.value.toUpperCase();
+                            const table = document.getElementById('productTableBody');
+                            const tr = table.getElementsByTagName('tr');
 
-            if (!product.name || !product.price) {
-                alert('Nombre y Precio son obligatorios');
-                return;
-            }
+                            for (let i = 0; i < tr.length; i++) { const td=tr[i].getElementsByTagName('td')[0]; if (td)
+                                { const txtValue=td.textContent || td.innerText; if
+                                (txtValue.toUpperCase().indexOf(filter)> -1) {
+                                tr[i].style.display = "";
+                                } else {
+                                tr[i].style.display = "none";
+                                }
+                                }
+                                }
+                                }
 
-            try {
-                if (isEdit) {
-                    await db.update({ ...product });
-                } else {
-                    await db.add(product);
-                }
-                modal.hide();
-                loadProducts();
-            } catch (error) {
-                console.error(error);
-                alert(error.message || 'Error al guardar');
-            }
-        }
+                                // Image Handling
+                                function handleFileSelect(evt) {
+                                const files = evt.target.files;
+                                if (!files) return;
 
-        async function deleteProduct(id) {
-            if (confirm('¿Estás seguro de eliminar este producto?')) {
-                try {
-                    await db.delete(id);
-                    loadProducts();
-                } catch (error) {
-                    console.error(error);
-                    alert('Error al eliminar');
-                }
-            }
-        }
+                                Array.from(files).forEach(file => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                currentImages.push(e.target.result);
+                                renderImagePreviews();
+                                };
+                                reader.readAsDataURL(file);
+                                });
+                                }
 
-        function searchProducts() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById('productTableBody');
-            const tr = table.getElementsByTagName('tr');
+                                function addUrlImage() {
+                                const url = document.getElementById('imageUrlInput').value;
+                                if (url) {
+                                currentImages.push(url);
+                                document.getElementById('imageUrlInput').value = '';
+                                renderImagePreviews();
+                                }
+                                }
 
-            for (let i = 0; i < tr.length; i++) {
-                const td = tr[i].getElementsByTagName('td')[0];
-                if (td) {
-                    const txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
+                                function renderImagePreviews() {
+                                const container = document.getElementById('imagePreviewContainer');
+                                container.innerHTML = '';
+                                currentImages.forEach((img, index) => {
+                                const div = document.createElement('div');
+                                div.style.position = 'relative';
+                                div.innerHTML = `
+                                <img src="${img}" class="preview-img">
+                                <button type="button" class="btn-close"
+                                    style="position:absolute; top:0; right:0; background-color:white;"
+                                    onclick="removeImage(${index})"></button>
+                                `;
+                                container.appendChild(div);
+                                });
+                                }
 
-        // Image Handling
-        function handleFileSelect(evt) {
-            const files = evt.target.files;
-            if (!files) return;
+                                window.removeImage = function (index) {
+                                currentImages.splice(index, 1);
+                                renderImagePreviews();
+                                }
+                                </script>
+                                <!-- Firebase SDKs -->
+                                <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+                                <script
+                                    src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+                                <script
+                                    src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentImages.push(e.target.result);
-                    renderImagePreviews();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function addUrlImage() {
-            const url = document.getElementById('imageUrlInput').value;
-            if (url) {
-                currentImages.push(url);
-                document.getElementById('imageUrlInput').value = '';
-                renderImagePreviews();
-            }
-        }
-
-        function renderImagePreviews() {
-            const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = '';
-            currentImages.forEach((img, index) => {
-                const div = document.createElement('div');
-                div.style.position = 'relative';
-                div.innerHTML = `
-                    <img src="${img}" class="preview-img">
-                    <button type="button" class="btn-close" 
-                        style="position:absolute; top:0; right:0; background-color:white;" 
-                        onclick="removeImage(${index})"></button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        window.removeImage = function (index) {
-            currentImages.splice(index, 1);
-            renderImagePreviews();
-        }
-    </script>
+                                <script src="js/firebase-config.js"></script>
+                                <script src="js/db.js"></script>
+                                <script src="js/auth.js"></script>
 </body>
 
 </html>

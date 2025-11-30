@@ -122,135 +122,83 @@
         }
 
         .loading {
-            display: none;
-            margin-top: 10px;
-        }
-    </style>
+            <p>Ingresa tus credenciales para continuar</p><div id="error-message" class="error-message"></div><form id="login-form" onsubmit="event.preventDefault(); handleLogin();"><div class="form-group"><label for="email"><i class="fas fa-envelope"></i>Correo Electrónico </label><input type="email" id="email" required autofocus placeholder="admin@rincotec.com"></div><div class="form-group"><label for="password"><i class="fas fa-lock"></i>Contraseña </label><input type="password" id="password" required placeholder="••••••••"></div><button type="submit" class="btn-login" id="login-btn"><i class="fas fa-sign-in-alt"></i>Ingresar </button><div class="loading" id="loading"><i class="fas fa-spinner fa-spin"></i>Iniciando sesión... </div></form><a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i>Volver al inicio </a></div>< !-- Firebase SDKs --><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>< !-- Firebase Config --><script src="js/firebase-config.js"></script><script>async function handleLogin() {
+                const email=document.getElementById('email').value;
+                const password=document.getElementById('password').value;
+                const errorMsg=document.getElementById('error-message');
+                const loginBtn=document.getElementById('login-btn');
+                const loading=document.getElementById('loading');
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-</head>
+                // Hide previous errors
+                errorMsg.style.display='none';
+                errorMsg.textContent='';
 
-<body>
-    <div class="login-container">
-        <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC">
-        <h1>Acceso Administrativo</h1>
-        <p>Ingresa tus credenciales para continuar</p>
+                // Show loading state
+                loginBtn.disabled=true;
+                loading.style.display='block';
 
-        <div id="error-message" class="error-message"></div>
+                try {
+                    // Sign in with Firebase
+                    await firebaseAuth.signInWithEmailAndPassword(email, password);
 
-        <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
-            <div class="form-group">
-                <label for="email">
-                    <i class="fas fa-envelope"></i> Correo Electrónico
-                </label>
-                <input type="email" id="email" required autofocus placeholder="admin@rincotec.com">
-            </div>
+                    // Get return URL or default to inventory
+                    const urlParams=new URLSearchParams(window.location.search);
+                    const returnUrl=urlParams.get('return') || 'inventory.html';
 
-            <div class="form-group">
-                <label for="password">
-                    <i class="fas fa-lock"></i> Contraseña
-                </label>
-                <input type="password" id="password" required placeholder="••••••••">
-            </div>
+                    // Redirect to requested page
+                    window.location.href=returnUrl;
 
-            <button type="submit" class="btn-login" id="login-btn">
-                <i class="fas fa-sign-in-alt"></i> Ingresar
-            </button>
-
-            <div class="loading" id="loading">
-                <i class="fas fa-spinner fa-spin"></i> Iniciando sesión...
-            </div>
-        </form>
-
-        <a href="index.html" class="back-link">
-            <i class="fas fa-arrow-left"></i> Volver al inicio
-        </a>
-    </div>
-
-    <!-- Firebase Config -->
-    <script src="js/firebase-config.js"></script>
-
-    <script>
-        async function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('error-message');
-            const loginBtn = document.getElementById('login-btn');
-            const loading = document.getElementById('loading');
-
-            // Hide previous errors
-            errorMsg.style.display = 'none';
-            errorMsg.textContent = '';
-
-            // Show loading state
-            loginBtn.disabled = true;
-            loading.style.display = 'block';
-
-            try {
-                // Sign in with Firebase
-                await firebaseAuth.signInWithEmailAndPassword(email, password);
-
-                // Get return URL or default to inventory
-                const urlParams = new URLSearchParams(window.location.search);
-                const returnUrl = urlParams.get('return') || 'inventory.html';
-
-                // Redirect to requested page
-                window.location.href = returnUrl;
-
-            } catch (error) {
-                console.error('Login error:', error);
-
-                // Show user-friendly error message
-                let errorMessage = 'Error al iniciar sesión';
-
-                switch (error.code) {
-                    case 'auth/invalid-email':
-                        errorMessage = 'Correo electrónico inválido';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = 'Usuario deshabilitado';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = 'Usuario no encontrado';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Contraseña incorrecta';
-                        break;
-                    case 'auth/invalid-credential':
-                        errorMessage = 'Credenciales inválidas';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Demasiados intentos fallidos. Intenta más tarde.';
-                        break;
-                    default:
-                        errorMessage = error.message;
                 }
 
-                errorMsg.textContent = errorMessage;
-                errorMsg.style.display = 'block';
+                catch (error) {
+                    console.error('Login error:', error);
 
-                // Reset form
-                document.getElementById('password').value = '';
-                document.getElementById('password').focus();
+                    // Show user-friendly error message
+                    let errorMessage='Error al iniciar sesión';
 
-                // Hide loading state
-                loginBtn.disabled = false;
-                loading.style.display = 'none';
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                            errorMessage='Correo electrónico inválido';
+                        break;
+                        case 'auth/user-disabled':
+                            errorMessage='Usuario deshabilitado';
+                        break;
+                        case 'auth/user-not-found':
+                            errorMessage='Usuario no encontrado';
+                        break;
+                        case 'auth/wrong-password':
+                            errorMessage='Contraseña incorrecta';
+                        break;
+                        case 'auth/invalid-credential':
+                            errorMessage='Credenciales inválidas';
+                        break;
+                        case 'auth/too-many-requests':
+                            errorMessage='Demasiados intentos fallidos. Intenta más tarde.';
+                        break;
+                        default:
+                            errorMessage=error.message;
+                    }
+
+                    errorMsg.textContent=errorMessage;
+                    errorMsg.style.display='block';
+
+                    // Reset form
+                    document.getElementById('password').value='';
+                    document.getElementById('password').focus();
+
+                    // Hide loading state
+                    loginBtn.disabled=false;
+                    loading.style.display='none';
+                }
             }
-        }
 
-        // Check if already authenticated
-        firebaseAuth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in, redirect
-                const urlParams = new URLSearchParams(window.location.search);
-                const returnUrl = urlParams.get('return') || 'inventory.html';
-                window.location.href = returnUrl;
-            }
-        });
-    </script>
-</body>
-
-</html>
+            // Check if already authenticated
+            firebaseAuth.onAuthStateChanged((user)=> {
+                    if (user) {
+                        // User is signed in, redirect
+                        const urlParams=new URLSearchParams(window.location.search);
+                        const returnUrl=urlParams.get('return') || 'inventory.html';
+                        window.location.href=returnUrl;
+                    }
+                });
+            </script></body></html>
