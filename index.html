@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RINCOTEC | Ingeniería y Ferretería Técnica</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="index-header">
+        <a href="#" class="logo">
+            <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC" style="height: 50px;">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="filterProducts('Todos')">Inicio</a></li>
+                <li><a href="#" onclick="filterProducts('🛒')">Tienda</a></li>
+                <li><a href="#" onclick="filterProducts('⚡')">Servicios</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Ingeniería <span>Aplicada</span> & Ferretería Técnica</h1>
+        <p>No somos solo una ferretería. Somos el centro de ingeniería donde tus proyectos cobran vida.<br><br>
+            En RINCOTEC, rompemos el molde tradicional. Fusionamos el abastecimiento de herramientas de gama profesional
+            con soluciones de ingeniería avanzada, creando un ecosistema técnico único en Colombia.<br><br>
+            No solo te vendemos un equipo; te entregamos la solución técnica que garantiza el éxito de tu obra, tu
+            instalación o tu aventura.</p>
+        <a href="#products" class="btn btn-primary">Ver Catálogo</a>
+    </section>
+
+    <!-- Pillars -->
+    <section class="pillars">
+        <div class="pillar-card" onclick="filterProducts('🛒')">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Ventas</h3>
+            <p>Herramientas, Material Eléctrico, Domótica y más.</p>
+        </div>
+        <div class="pillar-card" onclick="filterProducts('☀️')">
+            <i class="fas fa-solar-panel"></i>
+            <h3>Energía Solar</h3>
+            <p>Paneles, Inversores y Proyectos llave en mano.</p>
+        </div>
+        <div class="pillar-card" onclick="filterProducts('🖨️')">
+            <i class="fas fa-cubes"></i>
+            <h3>Impresión 3D</h3>
+            <p>Diseño, Prototipado y Manufactura Aditiva.</p>
+        </div>
+        <div class="pillar-card" onclick="filterProducts('⚡')">
+            <i class="fas fa-bolt"></i>
+            <h3>Servicios</h3>
+            <p>Mantenimiento, Instalaciones y Proyectos de Ingeniería.</p>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <div class="filters-container" id="products">
+        <button class="filter-btn active" onclick="filterProducts('Todos')">Todos</button>
+        <button class="filter-btn" onclick="filterProducts('🛒')">🛒 Ventas</button>
+        <button class="filter-btn" onclick="filterProducts('☀️')">☀️ Solar</button>
+        <button class="filter-btn" onclick="filterProducts('🖨️')">🖨️ 3D</button>
+        <button class="filter-btn" onclick="filterProducts('⚡')">⚡ Servicios</button>
+    </div>
+
+    <!-- Subcategory Filters (Hidden by default) -->
+    <div class="filters-container" id="subcategories" style="display:none; padding-top: 0;">
+        <!-- Populated by JS -->
+    </div>
+
+    <!-- Product Grid -->
+    <section class="products-grid" id="product-grid">
+        <!-- Products will be loaded here -->
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logo">
+            <img src="https://i.imgur.com/HebS8B1.jpeg" alt="RINCOTEC" style="height: 60px;">
+        </div>
+        <div class="social-links">
+            <a href="https://www.facebook.com/people/RincotecColombia/61583872334690/" target="_blank"><i
+                    class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/ferreterarincotec/?igsh=MTVrdnQxcXpnNnpmZA%3D%3D#" target="_blank"><i
+                    class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@ferreteriarincoteccol?_r=1&_t=ZS-91pd886z6vf" target="_blank"><i
+                    class="fab fa-tiktok"></i></a>
+            <a href="https://wa.me/573057617619" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <div class="copyright">
+            &copy; 2024 RINCOTEC Ingeniería. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    <!-- Database Module -->
+    <script src="js/db.js"></script>
+    <!-- Main Logic -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Productos - RINCOTEC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #231F20;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #FECD03;
+            color: #231F20;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #e5b800;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Agregar Productos de Ejemplo - RINCOTEC</h1>
+        <p>Este script agregará productos de ejemplo a la base de datos de Firestore.</p>
+
+        <button onclick="addSampleProducts()">Agregar Productos de Ejemplo</button>
+        <button onclick="clearAllProducts()" style="background: #dc3545; color: white;">Limpiar Todos los
+            Productos</button>
+
+        <div id="status"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+
+        function showStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            statusDiv.style.display = 'block';
+        }
+
+        const sampleProducts = [
+            // Herramientas Eléctricas
+            {
+                name: 'Taladro Percutor DeWalt 20V',
+                category: '🛒',
+                subcategory: 'Herramientas Eléctricas',
+                price: 450000,
+                stock: 8,
+                images: ['https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Pulidora Angular Bosch 7"',
+                category: '🛒',
+                subcategory: 'Herramientas Eléctricas',
+                price: 320000,
+                stock: 5,
+                images: ['https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Sierra Circular Makita 7-1/4"',
+                category: '🛒',
+                subcategory: 'Herramientas Eléctricas',
+                price: 380000,
+                stock: 6,
+                images: ['https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500'],
+                mlLink: ''
+            },
+            // Material Eléctrico
+            {
+                name: 'Interruptor Diferencial 40A',
+                category: '🛒',
+                subcategory: 'Material Eléctrico',
+                price: 85000,
+                stock: 15,
+                images: ['https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Cable THW 12 AWG (Metro)',
+                category: '🛒',
+                subcategory: 'Material Eléctrico',
+                price: 3500,
+                stock: 500,
+                images: ['https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=500'],
+                mlLink: ''
+            },
+            // Energía Solar
+            {
+                name: 'Panel Solar 550W Monocristalino',
+                category: '☀️',
+                subcategory: 'Componentes',
+                price: 650000,
+                stock: 12,
+                images: ['https://images.unsplash.com/photo-1509391366360-2e959784a276?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Inversor Híbrido 5kW MPPT',
+                category: '☀️',
+                subcategory: 'Componentes',
+                price: 2800000,
+                stock: 4,
+                images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Batería Litio 5.12kWh',
+                category: '☀️',
+                subcategory: 'Componentes',
+                price: 3500000,
+                stock: 3,
+                images: ['https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Instalación Sistema Solar Residencial',
+                category: '☀️',
+                subcategory: 'Instalación',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=500'],
+                mlLink: ''
+            },
+            // Impresión 3D
+            {
+                name: 'Impresión 3D - Pieza Personalizada',
+                category: '🖨️',
+                subcategory: 'Impresión',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Diseño CAD 3D Profesional',
+                category: '🖨️',
+                subcategory: 'Diseño',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Prototipado Rápido - Engranajes',
+                category: '🖨️',
+                subcategory: 'Impresión',
+                price: 45000,
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500'],
+                mlLink: ''
+            },
+            // Servicios
+            {
+                name: 'Mantenimiento Eléctrico Industrial',
+                category: '⚡',
+                subcategory: 'Mantenimiento',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Instalación Domótica Completa',
+                category: '⚡',
+                subcategory: 'Instalación',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1558002038-1055907df827?w=500'],
+                mlLink: ''
+            },
+            {
+                name: 'Proyecto de Ingeniería Eléctrica',
+                category: '⚡',
+                subcategory: 'General',
+                price: 0, // Cotizar
+                stock: 999,
+                images: ['https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500'],
+                mlLink: ''
+            },
+            // Baterías de Alto Rendimiento
+            {
+                name: 'Batería Antigravity ATZ-10 Litio',
+                category: '🛒',
+                subcategory: 'Herramientas Eléctricas',
+                price: 580000,
+                stock: 4,
+                images: ['https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=500'],
+                mlLink: ''
+            }
+        ];
+
+        async function addSampleProducts() {
+            showStatus('Agregando productos...', 'info');
+
+            try {
+                let added = 0;
+                for (const product of sampleProducts) {
+                    await firebaseDB.collection('products').add({
+                        ...product,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    added++;
+                }
+
+                showStatus(`✅ ${added} productos agregados exitosamente!`, 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearAllProducts() {
+            if (!confirm('¿Estás seguro de que quieres eliminar TODOS los productos?')) {
+                return;
+            }
+
+            showStatus('Eliminando productos...', 'info');
+
+            try {
+                const snapshot = await firebaseDB.collection('products').get();
+                const batch = firebaseDB.batch();
+
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                showStatus(`✅ ${snapshot.size} productos eliminados exitosamente!`, 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
