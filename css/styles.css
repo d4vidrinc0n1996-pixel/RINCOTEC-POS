@@ -370,3 +370,50 @@ button,
         font-weight: 700;
         color: var(--dark);
     }
+/* --- Filter Buttons --- */
+.filters-container {
+    display: flex;
+    gap: 12px;
+    padding: 40px 5%;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    border-bottom: 3px solid var(--primary);
+}
+
+.filter-btn {
+    padding: 14px 28px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: #555;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.filter-btn i {
+    font-size: 1.1rem;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+    color: var(--dark);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(254, 205, 3, 0.25);
+}
+
+.filter-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #e5b800 100%);
+    color: var(--dark);
+    box-shadow: 0 4px 15px rgba(254, 205, 3, 0.4);
+    font-weight: 700;
+}
