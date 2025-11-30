@@ -212,61 +212,6 @@ button,
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    color: var(--light);
-    text-align: left;
-    overflow: hidden;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    gap: 30px;
-    padding: 50px 5%;
-
-    .product-category {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: #999;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .product-title {
-        font-size: 1.1rem;
-        margin-bottom: 10px;
-        line-height: 1.4;
-    }
-
-    .product-price {
-        font-size: 1.3rem;
-        font-weight: 800;
-        color: var(--dark);
-        margin-top: auto;
-        margin-bottom: 15px;
-    }
-
-    .action-btn {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none;
-        transition: var(--transition);
-    }
-
-    .btn-whatsapp {
-        background-color: #25D366;
-        color: white;
-    }
 
     .btn-whatsapp:hover {
         background-color: #128C7E;
