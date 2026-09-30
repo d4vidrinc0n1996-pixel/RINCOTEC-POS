@@ -836,8 +836,35 @@
             '</style></head><body>' + $('printArea').innerHTML + '</body></html>';
     }
 
+    /** App instalable: funciona sin conexión y muestra el botón «Instalar app» cuando el navegador lo permite. */
+    function setupInstall() {
+        if (embedded || !location.protocol.startsWith('http')) return;
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => { /* sin modo sin conexión */ });
+        }
+        let deferred = null;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferred = e;
+            $('btnInstall').hidden = false;
+        });
+        $('btnInstall').addEventListener('click', async () => {
+            if (!deferred) return;
+            deferred.prompt();
+            const choice = await deferred.userChoice;
+            deferred = null;
+            $('btnInstall').hidden = true;
+            if (choice.outcome === 'accepted') notify('Instalando «Mostacillas» en tu dispositivo…');
+        });
+        window.addEventListener('appinstalled', () => {
+            $('btnInstall').hidden = true;
+            notify('App instalada. La encuentras en tu pantalla de inicio.');
+        });
+    }
+
     initControls();
     bindEvents();
+    setupInstall();
     updateSizeReadout();
     if (embedded) $('btnPrint').title = 'Descargar una hoja lista para imprimir o guardar como PDF';
     // Abre con la imagen de ejemplo para mostrar la app funcionando desde el inicio

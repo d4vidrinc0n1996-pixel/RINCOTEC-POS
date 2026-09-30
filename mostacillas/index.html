@@ -11,6 +11,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/mostacillas.css?v=2">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#231F20">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Mostacillas">
 </head>
 
 <body>
@@ -23,6 +30,7 @@
             </div>
         </div>
         <div class="header-actions">
+            <button class="btn btn-primary" id="btnInstall" hidden title="Instalar la app en este dispositivo"><i class="fa-solid fa-download"></i><span>Instalar app</span></button>
             <button class="btn btn-ghost" id="btnOpenProject" title="Abrir un proyecto guardado"><i class="fa-solid fa-folder-open"></i><span>Abrir</span></button>
             <button class="btn btn-ghost" id="btnSaveProject" disabled title="Guardar proyecto (.json)"><i class="fa-solid fa-floppy-disk"></i><span>Guardar</span></button>
             <button class="btn btn-ghost" id="btnExportPng" disabled title="Descargar el patrón como imagen"><i class="fa-solid fa-image"></i><span>PNG</span></button>
