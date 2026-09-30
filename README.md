@@ -62,8 +62,8 @@ Ver [DEPLOYMENT.md](DEPLOYMENT.md) para instrucciones detalladas de despliegue e
 
 ## 🔐 Credenciales por Defecto
 
-**Usuario Admin**: admin@rincotec.com  
-**Contraseña**: (configurar en Firebase Authentication)
+El usuario administrador se crea en Firebase Authentication (ver [DEPLOYMENT.md](DEPLOYMENT.md)).
+No guardes usuarios ni contraseñas en archivos del repositorio: Netlify publica todos los archivos.
 
 > ⚠️ **IMPORTANTE**: Cambia las credenciales después del primer despliegue.
 
