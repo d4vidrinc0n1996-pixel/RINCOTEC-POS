@@ -4,9 +4,13 @@ Aplicación web para convertir una imagen en un patrón de artesanía con mostac
 Funciona 100 % en el navegador (HTML, CSS y JavaScript sin dependencias ni Firebase):
 la imagen nunca sale del equipo del usuario.
 
-Publicada en **https://mostacillas.netlify.app**: un sitio de Netlify propio creado desde este
-repositorio con *Base directory* = `mostacillas` y *Publish directory* = `mostacillas`
-(usa `mostacillas/netlify.toml`). El sitio del POS redirige `/mostacillas/` a esa dirección.
+Se puede publicar de dos formas (usa rutas relativas, funciona en ambas):
+
+- **Sitio propio** (recomendado), por ejemplo `https://mostacillas.netlify.app`:
+  en Netlify crea un sitio nuevo desde este repositorio con
+  *Base directory* = `mostacillas` y *Publish directory* = `mostacillas`.
+  Netlify usa `mostacillas/netlify.toml`.
+- Dentro del sitio del POS, en `/mostacillas/`.
 
 ## Qué hace
 
@@ -32,7 +36,7 @@ repositorio con *Base directory* = `mostacillas` y *Publish directory* = `mostac
 
 La app es instalable (PWA) y funciona sin conexión después de abrirla una vez.
 
-- **Android (Chrome)**: abre `https://mostacillas.netlify.app` y toca **Instalar app**
+- **Android (Chrome)**: abre la dirección de la app (por ejemplo `https://mostacillas.netlify.app`) y toca **Instalar app**
   en la barra superior (o menú ⋮ → *Instalar aplicación*).
 - **iPhone/iPad (Safari)**: botón Compartir → *Agregar a pantalla de inicio*.
 - **Windows/Mac (Chrome o Edge)**: botón **Instalar app** o el ícono de instalar en la barra de direcciones.
