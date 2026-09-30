@@ -26,11 +26,26 @@ Se publica junto al resto del sitio en `/mostacillas/`.
 - **Edición**: pincel para retocar mostacillas, deshacer, cambiar el tono o el nombre/código de cada color.
 - **Exportar**: PNG con leyenda, CSV (Excel), impresión/PDF y proyecto `.json` para continuar después.
 
+## Instalar la app
+
+La app es instalable (PWA) y funciona sin conexión después de abrirla una vez.
+
+- **Android (Chrome)**: abre `https://<tu-sitio>/mostacillas/` y toca **Instalar app**
+  en la barra superior (o menú ⋮ → *Instalar aplicación*).
+- **iPhone/iPad (Safari)**: botón Compartir → *Agregar a pantalla de inicio*.
+- **Windows/Mac (Chrome o Edge)**: botón **Instalar app** o el ícono de instalar en la barra de direcciones.
+
+Al cambiar archivos de la app, sube `?v=` en `index.html` y la misma versión en
+`APP_SHELL` y `VERSION` de `sw.js` para que los dispositivos instalados se actualicen.
+
 ## Estructura
 
 ```
 mostacillas/
 ├── index.html
+├── manifest.webmanifest # Datos de la app instalable
+├── sw.js               # Funcionamiento sin conexión
+├── icons/              # Íconos de la app
 ├── css/mostacillas.css
 └── js/
     ├── beads-data.js   # Tipos de mostacilla, puntadas y catálogo de colores
@@ -47,4 +62,4 @@ mostacillas/
 - Los nombres del catálogo son referencias aproximadas, no códigos oficiales de fabricante.
   Escribe el código de tu proveedor en la columna «Nombre / código».
 - Netlify guarda en caché los `.js` y `.css` durante un año: al modificarlos,
-  sube el número `?v=` en las etiquetas de `index.html`.
+  sube el número `?v=` en las etiquetas de `index.html` (y en `sw.js`).
