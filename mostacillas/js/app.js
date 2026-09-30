@@ -119,12 +119,16 @@
             $('thumb').src = src;
             $('thumb').hidden = false;
             $('thumb').alt = name || 'Imagen cargada';
+            $('imageName').hidden = false;
+            $('imageName').textContent = name === 'Imagen de ejemplo'
+                ? 'Imagen de ejemplo cargada. Toca el recuadro para subir la tuya.'
+                : 'Imagen: ' + (name || 'pegada desde el portapapeles');
             $('dropText').hidden = true;
             syncRatio('cols');
             updateSizeReadout();
             generate();
         };
-        img.onerror = () => alert('No se pudo abrir la imagen. Prueba con un archivo JPG o PNG.');
+        img.onerror = () => notify('No se pudo abrir la imagen. Prueba con un archivo JPG o PNG.');
         img.src = src;
     }
 
@@ -407,7 +411,43 @@
     }
 
     // ---------- Exportar ----------
-    function download(blob, filename) {
+    /** true cuando la app corre dentro del visor de Claude (sin descargas directas ni impresión). */
+    const embedded = !!(window.claude && typeof window.claude.use === 'function');
+
+    let toastTimer = null;
+    function notify(text) {
+        let el = document.getElementById('toast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'toast';
+            el.className = 'toast';
+            el.setAttribute('role', 'status');
+            document.body.appendChild(el);
+        }
+        el.textContent = text;
+        el.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
+    }
+
+    async function download(blob, filename) {
+        if (embedded) {
+            const downloads = await window.claude.use('downloads');
+            if (!downloads) {
+                notify('Las descargas no están disponibles en esta vista.');
+                return;
+            }
+            try {
+                await downloads.save({ filename, data: blob });
+                notify('Archivo guardado: ' + filename);
+            } catch (e) {
+                if (e && e.code === 'declined') return;
+                notify(e && e.code === 'rate_limited'
+                    ? 'Ya hay una descarga esperando confirmación.'
+                    : 'No se pudo guardar el archivo en esta vista.');
+            }
+            return;
+        }
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = filename;
@@ -498,7 +538,7 @@
                 data = JSON.parse(reader.result);
                 if (data.app !== 'mostacillas' || !Array.isArray(data.grid) || data.grid.length !== data.cols * data.rows) throw new Error();
             } catch (e) {
-                alert('El archivo no es un proyecto de mostacillas válido.');
+                notify('El archivo no es un proyecto de mostacillas válido (.json guardado desde esta app).');
                 return;
             }
             const s = data.settings;
@@ -742,11 +782,22 @@
                 setActiveStep(i, true);
             }
         });
+        // Reiniciar pide un segundo toque para confirmar (sin diálogos del navegador)
+        let resetArmed = null;
         $('btnResetProgress').addEventListener('click', () => {
-            if (!state.done.size || !confirm('¿Borrar el avance marcado?')) return;
+            const btn = $('btnResetProgress');
+            if (!state.done.size) return;
+            if (!resetArmed) {
+                btn.lastChild.textContent = ' ¿Borrar avance? Toca de nuevo';
+                resetArmed = setTimeout(() => { resetArmed = null; btn.lastChild.textContent = ' Reiniciar'; }, 3000);
+                return;
+            }
+            clearTimeout(resetArmed); resetArmed = null;
+            btn.lastChild.textContent = ' Reiniciar';
             state.done.clear();
             saveProgress();
             renderSteps();
+            notify('Avance borrado.');
         });
 
         // Archivo / exportar
@@ -755,7 +806,11 @@
         $('projectInput').addEventListener('change', e => { if (e.target.files[0]) openProject(e.target.files[0]); e.target.value = ''; });
         $('btnExportPng').addEventListener('click', exportPng);
         $('btnExportCsv').addEventListener('click', exportCsv);
-        $('btnPrint').addEventListener('click', () => { buildPrintArea(); window.print(); });
+        $('btnPrint').addEventListener('click', () => {
+            buildPrintArea();
+            if (embedded) download(new Blob([printableDocument()], { type: 'text/html' }), 'patron-mostacillas-imprimible.html');
+            else window.print();
+        });
         window.addEventListener('beforeprint', () => { if (state.pattern) buildPrintArea(); });
     }
 
@@ -767,9 +822,26 @@
         renderCanvas();
     }
 
+    /** Hoja imprimible independiente (para abrir en el navegador e imprimir o guardar como PDF). */
+    function printableDocument() {
+        return '<!doctype html><html lang="es"><head><meta charset="utf-8">' +
+            '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+            '<title>Patrón de mostacillas</title><style>' +
+            'body{font-family:system-ui,sans-serif;font-size:11pt;color:#000;background:#fff;margin:16px}' +
+            'h1{font-size:18pt;margin:0 0 4pt}h2{font-size:13pt;margin:14pt 0 6pt}img{max-width:100%;display:block}' +
+            'table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3pt 5pt;text-align:left}.num{text-align:right}' +
+            'ul,ol{padding-left:18pt}.steps-print li{margin-bottom:3pt;break-inside:avoid}.page-break{break-before:page}' +
+            '.sw{display:inline-block;width:13pt;height:13pt;border:1px solid #555;vertical-align:middle;text-align:center;' +
+            'font-size:7pt;line-height:13pt;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+            '</style></head><body>' + $('printArea').innerHTML + '</body></html>';
+    }
+
     initControls();
     bindEvents();
     updateSizeReadout();
+    if (embedded) $('btnPrint').title = 'Descargar una hoja lista para imprimir o guardar como PDF';
+    // Abre con la imagen de ejemplo para mostrar la app funcionando desde el inicio
+    loadImageFromUrl(demoImage(), 'Imagen de ejemplo');
 
     // Punto de acceso para pruebas y depuración
     M.app = { state, generate, loadImageFromUrl, demoImage };
