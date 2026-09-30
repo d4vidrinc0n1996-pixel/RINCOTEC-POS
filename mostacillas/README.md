@@ -44,6 +44,19 @@ La app es instalable (PWA) y funciona sin conexión después de abrirla una vez.
 Al cambiar archivos de la app, sube `?v=` en `index.html` y la misma versión en
 `APP_SHELL` y `VERSION` de `sw.js` para que los dispositivos instalados se actualicen.
 
+## App Android (APK)
+
+La carpeta `android/` del repositorio es una app Android que lleva la app web por dentro
+(se toma directamente de `mostacillas/`) y agrega elegir archivos, guardar en Descargas e imprimir.
+
+- GitHub Actions la compila con `.github/workflows/mostacillas-android.yml` cada vez que
+  cambian `mostacillas/` o `android/` en `main`, y publica `Mostacillas.apk` en Releases.
+- Descarga de la última versión:
+  https://github.com/d4vidrinc0n1996-pixel/RINCOTEC-POS/releases/latest/download/Mostacillas.apk
+- El APK está firmado con una clave de depuración generada en cada compilación: para instalar
+  una versión nueva puede ser necesario desinstalar la anterior. Para publicar en Play Store
+  hace falta una clave de firma propia.
+
 ## Estructura
 
 ```

@@ -430,7 +430,23 @@
         toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
     }
 
+    /** Puente de la app Android (android/): guarda archivos e imprime con funciones nativas. */
+    const android = window.AndroidBridge || null;
+
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
     async function download(blob, filename) {
+        if (android) {
+            android.saveFile(filename, (blob.type || 'application/octet-stream').split(';')[0], await blobToBase64(blob));
+            return;
+        }
         if (embedded) {
             const downloads = await window.claude.use('downloads');
             if (!downloads) {
@@ -808,7 +824,8 @@
         $('btnExportCsv').addEventListener('click', exportCsv);
         $('btnPrint').addEventListener('click', () => {
             buildPrintArea();
-            if (embedded) download(new Blob([printableDocument()], { type: 'text/html' }), 'patron-mostacillas-imprimible.html');
+            if (android) android.printHtml(printableDocument());
+            else if (embedded) download(new Blob([printableDocument()], { type: 'text/html' }), 'patron-mostacillas-imprimible.html');
             else window.print();
         });
         window.addEventListener('beforeprint', () => { if (state.pattern) buildPrintArea(); });

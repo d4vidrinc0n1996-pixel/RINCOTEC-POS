@@ -1,0 +1,61 @@
+# Compila el instalador Android (APK) de la app de mostacillas y lo publica en
+# Releases. Descarga directa de la última versión:
+# https://github.com/d4vidrinc0n1996-pixel/RINCOTEC-POS/releases/latest/download/Mostacillas.apk
+name: Compilar APK de Mostacillas
+
+on:
+  push:
+    branches: [main]
+    paths: ['mostacillas/**', 'android/**', '.github/workflows/mostacillas-android.yml']
+  pull_request:
+    paths: ['mostacillas/**', 'android/**', '.github/workflows/mostacillas-android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      APK_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compilar APK
+        run: gradle --no-daemon -p android assembleRelease
+
+      - name: Preparar archivo
+        run: cp android/app/build/outputs/apk/release/app-release.apk Mostacillas.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Mostacillas-apk
+          path: Mostacillas.apk
+
+      - name: Publicar en Releases
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mostacillas-apk-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Mostacillas para Android (versión 1.${{ github.run_number }})
+          make_latest: true
+          files: Mostacillas.apk
+          body: |
+            Instalador Android de **Patrones de Mostacillas**.
+
+            1. Descarga `Mostacillas.apk` desde el celular.
+            2. Ábrelo y, si Android lo pide, permite «Instalar apps desconocidas» para Chrome o Archivos.
+            3. Toca **Instalar**.
+
+            La app funciona sin internet. Los archivos que exportas (PNG, CSV, proyecto) se guardan en **Descargas**.

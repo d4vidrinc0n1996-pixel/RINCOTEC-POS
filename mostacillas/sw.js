@@ -2,17 +2,17 @@
  * Service worker de Patrones de Mostacillas: guarda la app para usarla sin
  * conexión. Al cambiar archivos de la app, sube VERSION para renovar la caché.
  */
-const VERSION = 'mostacillas-v2';
+const VERSION = 'mostacillas-v3';
 const APP_SHELL = [
     './',
     'index.html',
     'manifest.webmanifest',
-    'css/mostacillas.css?v=2',
-    'js/beads-data.js?v=2',
-    'js/color.js?v=2',
-    'js/pattern.js?v=2',
-    'js/render.js?v=2',
-    'js/app.js?v=2',
+    'css/mostacillas.css?v=3',
+    'js/beads-data.js?v=3',
+    'js/color.js?v=3',
+    'js/pattern.js?v=3',
+    'js/render.js?v=3',
+    'js/app.js?v=3',
     'icons/icon-192.png',
     'icons/icon-512.png',
     'icons/apple-touch-icon.png',
