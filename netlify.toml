@@ -94,16 +94,3 @@
   to = "/404.html"
   status = 404
   force = true
-
-# La app de mostacillas tiene su propio sitio: https://mostacillas.netlify.app
-[[redirects]]
-  from = "/mostacillas"
-  to = "https://mostacillas.netlify.app/"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/mostacillas/*"
-  to = "https://mostacillas.netlify.app/:splat"
-  status = 301
-  force = true
