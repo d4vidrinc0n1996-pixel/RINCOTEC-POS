@@ -1,12 +1,13 @@
-# Publica la app de mostacillas en GitHub Pages:
-# https://d4vidrinc0n1996-pixel.github.io/RINCOTEC-POS/
+# Publica las apps estáticas en GitHub Pages:
+# Mostacillas:   https://d4vidrinc0n1996-pixel.github.io/RINCOTEC-POS/
+# Vectorizador:  https://d4vidrinc0n1996-pixel.github.io/RINCOTEC-POS/vectorizador/
 # Requiere activar Pages una vez: Settings → Pages → Source: "GitHub Actions".
 name: Publicar mostacillas en GitHub Pages
 
 on:
   push:
     branches: [main]
-    paths: ['mostacillas/**']
+    paths: ['mostacillas/**', 'vectorizador/**']
   workflow_dispatch:
 
 permissions:
@@ -46,6 +47,9 @@ jobs:
           mkdir _site
           cp -r mostacillas/. _site/
           rm -f _site/README.md _site/netlify.toml
+          mkdir _site/vectorizador
+          cp -r vectorizador/. _site/vectorizador/
+          rm -f _site/vectorizador/README.md
 
       - uses: actions/configure-pages@v5
         if: steps.pages.outputs.enabled == 'true'
