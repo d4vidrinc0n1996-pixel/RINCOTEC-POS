@@ -5,7 +5,8 @@ Convierte una imagen (PNG/JPG/etc.) en contornos vectoriales cerrados y los expo
 ## Uso
 Abre `vectorizador/index.html` con un servidor HTTP local, carga una imagen (arrastrar, elegir o pegar), ajusta los controles y descarga.
 
-- **Umbral**: separa "tinta" de fondo (automático con Otsu, o manual). *Invertir* traza las zonas claras.
+- **Modo**: *Blanco y negro* (una capa) o *Varios colores*, que reduce la imagen a N colores (k-means), omite opcionalmente el fondo y crea **una capa DXF por color** (`COLOR_n_RRGGBB`, con el color ACI más cercano). El SVG sale con un relleno por color.
+- **Umbral** (blanco y negro): separa "tinta" de fondo (automático con Otsu, o manual). *Invertir* traza las zonas claras.
 - **Suavizado / Simplificación**: menos ruido y menos vértices (Douglas-Peucker).
 - **Ignorar manchas**: descarta contornos diminutos.
 - **Ancho final (mm)**: escala del dibujo; el DXF sale en milímetros con el eje Y hacia arriba.
@@ -14,4 +15,4 @@ Abre `vectorizador/index.html` con un servidor HTTP local, carga una imagen (arr
 `js/vectorize.js` (marching squares con interpolación subpíxel + simplificación) y `js/export.js` (escritores DXF/SVG). Cada contorno se exporta como `POLYLINE` cerrada en la capa indicada.
 
 ## Limitaciones
-Traza por umbral (blanco y negro). No hay modo de varios colores ni ajuste de curvas (los contornos son polilíneas).
+Los contornos son polilíneas (sin ajuste de curvas). En modo color, los degradados y colores muy parecidos se fusionan según el número de colores elegido.

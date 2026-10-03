@@ -185,7 +185,92 @@
     return { loops, threshold, width: w, height: h };
   }
 
-  const api = { vectorize, traceContours, simplifyClosed, polyArea, otsu, toGray, boxBlur };
+  /* ---------- Modo color: k-means en RGB + un conjunto de contornos por color ---------- */
+  function kmeans(rgb, n, k) {
+    let seed = 12345;
+    const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+    const step = Math.max(1, Math.floor(n / 20000));
+    const sample = [];
+    for (let i = 0; i < n; i += step) sample.push(i * 3);
+    const d2 = (i, c) => (rgb[i] - c[0]) ** 2 + (rgb[i + 1] - c[1]) ** 2 + (rgb[i + 2] - c[2]) ** 2;
+    const cents = [];
+    const f = sample[Math.floor(rnd() * sample.length)];
+    cents.push([rgb[f], rgb[f + 1], rgb[f + 2]]);
+    while (cents.length < k) { // k-means++
+      const ds = sample.map((i) => Math.min(...cents.map((c) => d2(i, c))));
+      let r = rnd() * ds.reduce((a, b) => a + b, 0), j = 0;
+      while (j < ds.length - 1 && (r -= ds[j]) > 0) j++;
+      const i = sample[j];
+      cents.push([rgb[i], rgb[i + 1], rgb[i + 2]]);
+    }
+    for (let it = 0; it < 12; it++) {
+      const acc = cents.map(() => [0, 0, 0, 0]);
+      for (const i of sample) {
+        let b = 0, bd = Infinity;
+        for (let c = 0; c < k; c++) { const d = d2(i, cents[c]); if (d < bd) { bd = d; b = c; } }
+        const a = acc[b]; a[0] += rgb[i]; a[1] += rgb[i + 1]; a[2] += rgb[i + 2]; a[3]++;
+      }
+      acc.forEach((a, c) => { if (a[3]) cents[c] = [a[0] / a[3], a[1] / a[3], a[2] / a[3]]; });
+    }
+    return cents;
+  }
+
+  /**
+   * opts: { colors, ignoreBg, blur, tolerance, minArea }
+   * Devuelve { layers:[{color:[r,g,b], loops, isBg}], width, height }
+   */
+  function vectorizeColors(rgba, w, h, opts) {
+    const o = Object.assign({ colors: 4, ignoreBg: true, blur: 1, tolerance: 0.8, minArea: 16 }, opts);
+    const n = w * h;
+    // Composición sobre blanco y pre-suavizado por canal para reducir ruido en bordes
+    const ch = [0, 1, 2].map((c) => {
+      const a = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const al = rgba[i * 4 + 3] / 255; a[i] = rgba[i * 4 + c] * al + 255 * (1 - al); }
+      return boxBlur(a, w, h, Math.round(o.blur));
+    });
+    const rgb = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { rgb[i * 3] = ch[0][i]; rgb[i * 3 + 1] = ch[1][i]; rgb[i * 3 + 2] = ch[2][i]; }
+
+    const k = Math.max(2, Math.min(12, Math.round(o.colors)));
+    const cents = kmeans(rgb, n, k);
+    const label = new Uint8Array(n);
+    const count = new Array(k).fill(0);
+    for (let i = 0; i < n; i++) {
+      let b = 0, bd = Infinity;
+      for (let c = 0; c < k; c++) {
+        const d = (rgb[i * 3] - cents[c][0]) ** 2 + (rgb[i * 3 + 1] - cents[c][1]) ** 2 + (rgb[i * 3 + 2] - cents[c][2]) ** 2;
+        if (d < bd) { bd = d; b = c; }
+      }
+      label[i] = b; count[b]++;
+    }
+    // Fondo = color más frecuente en el borde de la imagen
+    const edge = new Array(k).fill(0);
+    for (let x = 0; x < w; x++) { edge[label[x]]++; edge[label[(h - 1) * w + x]]++; }
+    for (let y = 0; y < h; y++) { edge[label[y * w]]++; edge[label[y * w + w - 1]]++; }
+    const bg = edge.indexOf(Math.max(...edge));
+
+    const layers = [];
+    const order = cents.map((_, c) => c).sort((a, b) => count[b] - count[a]);
+    for (const c of order) {
+      if (!count[c]) continue;
+      const isBg = c === bg;
+      const color = cents[c].map(Math.round);
+      if (isBg && o.ignoreBg) { layers.push({ color, loops: [], isBg }); continue; }
+      const mask = new Float32Array(n);
+      for (let i = 0; i < n; i++) mask[i] = label[i] === c ? 0 : 255;
+      const field = boxBlur(mask, w, h, 1);
+      const loops = [];
+      for (const raw of traceContours(field, w, h, 127.5)) {
+        if (Math.abs(polyArea(raw)) < o.minArea) continue;
+        const s = simplifyClosed(raw, o.tolerance);
+        if (s.length >= 3) loops.push(s);
+      }
+      layers.push({ color, loops, isBg });
+    }
+    return { layers, width: w, height: h };
+  }
+
+  const api = { vectorize, vectorizeColors, traceContours, simplifyClosed, polyArea, otsu, toGray, boxBlur };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Vectorize = api;
 })(typeof self !== 'undefined' ? self : this);
