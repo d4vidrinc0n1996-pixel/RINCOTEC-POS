@@ -24,7 +24,6 @@ Sistema de Punto de Venta (POS) para RINCOTEC - Ingeniería y Ferretería Técni
 - ✅ Exportación de datos a CSV
 - ✅ Diseño responsive
 - ✅ [Patrones de Mostacillas](mostacillas/README.md): convierte imágenes en patrones de artesanía con cantidades por color y materiales (`/mostacillas/`)
-- ✅ [Vectorizador de imágenes](vectorizador/README.md): convierte imágenes en contornos DXF/SVG para CAD, láser o CNC (`/vectorizador/`)
 
 ## 🛠️ Desarrollo Local
 
